@@ -53,7 +53,8 @@ class BIN_Interaction_Flat(nn.Sequential):
         self.p_encoder = Encoder_MultipleLayers(self.n_layer, self.hidden_size, self.intermediate_size, self.num_attention_heads, self.attention_probs_dropout_prob, self.hidden_dropout_prob)
 
         self.icnn = nn.Conv2d(1, 3, 3, padding = 0)
-
+        self.dropout = nn.Dropout(p=self.dropout_rate)
+        
         self.decoder = nn.Sequential(
             nn.Linear(self.flatten_dim, 512),
             nn.ReLU(True),
@@ -100,7 +101,7 @@ class BIN_Interaction_Flat(nn.Sequential):
         i_v = torch.unsqueeze(i_v, 1)
         #print(i_v.shape)
 
-        i_v = F.dropout(i_v, p = self.dropout_rate)
+        i_v = self.dropout(i_v)
 
         #f = self.icnn2(self.icnn1(i_v))
         f = self.icnn(i_v)
@@ -117,7 +118,7 @@ class BIN_Interaction_Flat(nn.Sequential):
 
         #score = self.decoder(torch.cat((f, f_encode), dim = 1))
         score = self.decoder(f)
-        return score, i
+        return score
 
 # help classes
 
